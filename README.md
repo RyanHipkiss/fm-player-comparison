@@ -1,2 +1,5 @@
-# fm-player-comparison
-A Player Comparison Tool built using Python, to determine the best signings to make
+# FM Player Comparison
+
+## Overview
+
+A tool to compare players in a given data set, and determine the best signings to make for each position - based on the designated tactic.
