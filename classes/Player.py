@@ -198,8 +198,11 @@ class Player:
             if ',' in value:
                 # Locales do not matter as this will always be ENG/UK 
                 value = value.replace(',', '')
-            if '£' in value:
-                value = value.replace('£', '')
+            # if '£' in value:
+            #     value = value.replace('£', '')
+            if value == '-':
+                # If we do not know the value, we can't work out their score from it, so zero allows us to not account for it.
+                value = 0
             return float(value) if isinstance(value, (int, float, str)) and self._canCastToFloat(value) else value
         except ValueError:
             return value
@@ -209,8 +212,37 @@ class Player:
             return int(value)
         
         if value == '-':
-            return value
+            return 0
         
         values = [int(num) for num in value.split('-')]
 
         return int(sum(values) / len(values))
+
+    def getScore(self):
+        with open('weights.json') as file:
+            data = json.load(file)
+
+            return round((
+                ((self.wor + self.tea) * data['work']) + 
+                ((self.acc + self.pac + self.nat + self.sta) * data['speed']) + 
+                ((self.dec + self.com + self.otb + self.det) * data['finishing']) + 
+                ((self.fin + self.fir + self.drb) * data['technical'])
+            ) / 4, 2)
+        
+    def getValue(self) -> float:
+        return 0
+        # if self.transfer_value == "Not for Sale" or self.transfer_value == 'Unknown':
+        #     return 1000000000
+        
+        # self.transfer_value = self.transfer_value.replace('M', '000000')
+        # self.transfer_value = self.transfer_value.replace('K', '000')
+        # if '-' not in self.transfer_value:
+        #     return float(self.transfer_value.replace('£', '').replace('M', ''))
+        
+        # value = self.transfer_value.replace('£', '').replace('M', '')
+
+        # return sum([float(num) for num in value.split('-')])
+        # # return 0
+        
+
+        
