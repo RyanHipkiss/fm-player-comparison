@@ -13,12 +13,12 @@ class Player:
         self.transfer_value = row[8]
         self.av_rat = self._castToFloat(row[9])
         self.gls = self._castToFloat(row[10]) 
-        self.xg = self._castToFloat(row[11]) 
-        self.pens_s = self._castToFloat(row[12]) 
-        self.pen_r = self._castToFloat(row[13]) 
-        self.shot_90 = self._castToFloat(row[14]) 
-        self.shot_pct = self._castToFloat(row[15]) 
-        self.sht_90 = self._castToFloat(row[16]) 
+        self.pens_s = self._castToFloat(row[11]) 
+        self.pen_r = self._castToFloat(row[12]) 
+        self.shot_90 = self._castToFloat(row[13]) 
+        self.shot_pct = self._castToFloat(row[14]) 
+        self.sht_90 = self._castToFloat(row[15])
+        self.xg = self._castToFloat(row[16])  
         self.asts_90 = self._castToFloat(row[17]) 
         self.ps_c_90 = self._castToFloat(row[18]) 
         self.pas_pct = self._castToFloat(row[19]) 
@@ -159,24 +159,6 @@ class Player:
         self.inf = self._castToFloat(row[154]) 
         self.rec = self._castToFloat(row[155]) 
 
-    def isCenterBack():
-        return False
-    
-    def isWingBack(self):
-        return ('D' in self.position or 'WB' in self.position) and any(x in self.position for x in ('R', 'L', 'RL'))
-    
-    def isDefensiveMid():
-        return False
-    
-    def isAttackingMid():
-        return False
-    
-    def isWinger():
-        return False
-    
-    def isStriker():
-        return False
-
     def getData(self):
         return self.__dict__
     
@@ -218,31 +200,18 @@ class Player:
 
         return int(sum(values) / len(values))
 
+    # only AFA score right now
     def getScore(self):
-        with open('weights.json') as file:
-            data = json.load(file)
+        key = self.acc + self.pac + self.fin
+        green = self.dri + self.fir + self.tec + self.cmp + self.otb
+        blue = self.pas + self.ant + self.dec + self.wor + self.agi + self.bal + self.sta
 
-            return round((
-                ((self.wor + self.tea) * data['work']) + 
-                ((self.acc + self.pac + self.nat + self.sta) * data['speed']) + 
-                ((self.dec + self.com + self.otb + self.det) * data['finishing']) + 
-                ((self.fin + self.fir + self.drb) * data['technical'])
-            ) / 4, 2)
-        
-    def getValue(self) -> float:
-        return 0
-        # if self.transfer_value == "Not for Sale" or self.transfer_value == 'Unknown':
-        #     return 1000000000
-        
-        # self.transfer_value = self.transfer_value.replace('M', '000000')
-        # self.transfer_value = self.transfer_value.replace('K', '000')
-        # if '-' not in self.transfer_value:
-        #     return float(self.transfer_value.replace('£', '').replace('M', ''))
-        
-        # value = self.transfer_value.replace('£', '').replace('M', '')
+        return round(((key * 5) + (green * 3) + blue) / 37, 1)
 
-        # return sum([float(num) for num in value.split('-')])
-        # # return 0
-        
+    def getOverall(self):
+        return round(self.getScore() + self.getXgOverperformance() / 2, 1)
+
+    def getXgOverperformance(self):
+        return round(self.gls - self.xg, 1)
 
         
