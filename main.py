@@ -1,39 +1,45 @@
-from classes.Player import Player
 from classes.Convert import Convert
-import json
-from typing import List
+from prettytable import PrettyTable
 import argparse
+from typing import List
+from classes.Player import  Player
+import importlib
 
 parser = argparse.ArgumentParser(description="Example script")
 parser.add_argument('numPlayers', help='The number of players to return')
-# parser.add_argument('maxCost', help='Max transfer value of the player (upper limit if range)')
-parser.add_argument('position', help='The position you want to compare', nargs="?")
+parser.add_argument('position', help='The position you want to compare', nargs="*")
 args = parser.parse_args()
 
-convert = Convert('example-data/wolves-moneyball-example-player-list.html', 'example-data/wolves-moneyball-example-player-list.csv')
-players = convert.getCsvContent()
+# Convert players
+convert = Convert('example-data/search.html', 'example-data/search.csv')
+players: List[Player] = convert.getPlayers()
 
-examplePlayers: List[Player] = []
+fieldNames = list()
+for position in args.position:
+    fieldNames.append(position)
 
+fieldNames.insert(0, 'Name')
+fieldNames.append('Value')
+fieldNames.append('Club')
+
+calculatedPlayers = list()
 for p in players:
-    examplePlayers.append(Player(p))
+    playerValues = list()
+    playerValues.append(p.name)
+    for position in args.position:
+        moduleName = f"classes.{position}"
+        module = importlib.import_module(moduleName)
+        classObj = getattr(module, position)
+        positionObj = classObj(p)
+        playerValues.append(positionObj.getScore())
+        playerValues.append(p.transfer_value)
+        playerValues.append(p.club)
+    calculatedPlayers.append(playerValues)
 
-playerT = list()
 
-for p in examplePlayers:
-    if args.position is not None and args.position not in p.position:
-        continue
-
-    playerT.append([p.name, p.transfer_value, p.getScore(), p.getXgOverperformance(), p.drb_90, p.shot_pct, p.hdr_pct])
-
-sPlayerT = sorted(playerT, key=lambda x: x[2], reverse=True)
-limited = sPlayerT[:int(args.numPlayers)]
-
-from prettytable import PrettyTable
+sorted = sorted(calculatedPlayers, key=lambda x: x[1], reverse=True)[:int(args.numPlayers)]
 
 table = PrettyTable()
-
-table.field_names = ['Name', 'Transfer Value', 'Role Ability', 'xG Overperformance', 'Dribbles per 90', 'Shot %', 'Header %']
-table.add_rows(limited)
+table.field_names = fieldNames
+table.add_rows(sorted)
 print(table)
-# print(json.dumps(examplePlayers[82].getData(), indent=2))

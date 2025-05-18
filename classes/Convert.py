@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
 import csv
 
+from classes.Player import Player
+
+
 class Convert:
     def __init__(self, html_file, csv_file):
         self.html_file = html_file
@@ -41,3 +44,11 @@ class Convert:
                 if any(cell.strip() for cell in row):  # Check if row has non-empty values
                     content.append(row)
         return content
+
+    def getPlayers(self):
+        content = self.getCsvContent()
+        players = []
+        for row in content:
+            players.append(Player(row))
+
+        return players
