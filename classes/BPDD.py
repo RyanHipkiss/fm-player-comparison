@@ -8,7 +8,7 @@ class BPDD:
 
     def getScore(self):
         key = self.player.acc + self.player.pac + self.player.jum + self.player.cmp
-        green = self.player.hea + self.player.mar + self.player.tck + self.player.pos + self.player.str
+        green = self.player.hea + self.player.mar + self.player.tck + self.player.pos + self.player.str + self.player.pas
         blue = self.player.fir + self.player.tec + self.player.agg + self.player.ant + self.player.bra + self.player.cnt + self.player.dec + self.player.vis
 
         return round(

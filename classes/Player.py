@@ -157,7 +157,6 @@ class Player:
         self.xg_90 = self._castToFloat(row[152])
         self.saves_90 = self._castToFloat(row[153])
         self.inf = self._castToFloat(row[154])
-        self.rec = self._castToFloat(row[155])
 
     def getData(self):
         return self.__dict__
